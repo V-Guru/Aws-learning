@@ -1,0 +1,18 @@
+{
+  "name": "iot-cdk",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "packages/functions/*"
+  ],
+  "scripts": {
+     "build": "npm run build --workspaces --if-present",
+     "test": "npm run test --workspaces --if-present",
+     "cdk":"npm run cdk --workspace=@iot-cdk/infra",
+     "deploy":"npm run cdk -- deploy --all", 
+     "synth":"npm run cdk -- synth" 
+  },
+  "keywords": [],
+  "author": "Suresh"
+}

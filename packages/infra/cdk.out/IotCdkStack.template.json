@@ -1,0 +1,606 @@
+{
+ "Resources": {
+  "DeviceDataBucket83CE3970": {
+   "Type": "AWS::S3::Bucket",
+   "Properties": {
+    "Tags": [
+     {
+      "Key": "aws-cdk:auto-delete-objects",
+      "Value": "true"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "IotCdkStack/DeviceDataBucket/Resource"
+   }
+  },
+  "DeviceDataBucketPolicy08B7BD9B": {
+   "Type": "AWS::S3::BucketPolicy",
+   "Properties": {
+    "Bucket": {
+     "Ref": "DeviceDataBucket83CE3970"
+    },
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "s3:PutBucketPolicy",
+        "s3:GetBucket*",
+        "s3:List*",
+        "s3:DeleteObject*"
+       ],
+       "Effect": "Allow",
+       "Principal": {
+        "AWS": {
+         "Fn::GetAtt": [
+          "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092",
+          "Arn"
+         ]
+        }
+       },
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "DeviceDataBucket83CE3970",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "DeviceDataBucket83CE3970",
+             "Arn"
+            ]
+           },
+           "/*"
+          ]
+         ]
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "IotCdkStack/DeviceDataBucket/Policy/Resource"
+   }
+  },
+  "DeviceDataBucketAutoDeleteObjectsCustomResourceDCC23A54": {
+   "Type": "Custom::S3AutoDeleteObjects",
+   "Properties": {
+    "ServiceToken": {
+     "Fn::GetAtt": [
+      "CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F",
+      "Arn"
+     ]
+    },
+    "BucketName": {
+     "Ref": "DeviceDataBucket83CE3970"
+    }
+   },
+   "DependsOn": [
+    "DeviceDataBucketPolicy08B7BD9B"
+   ],
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "IotCdkStack/DeviceDataBucket/AutoDeleteObjectsCustomResource/Default"
+   }
+  },
+  "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Version": "2012-10-17",
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ]
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Sub": "arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "IotCdkStack/Custom::S3AutoDeleteObjectsCustomResourceProvider/Role"
+   }
+  },
+  "CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-411310021228-ap-south-1",
+     "S3Key": "faa95a81ae7d7373f3e1f242268f904eb748d8d0fdd306e8a6fe515a1905a7d6.zip"
+    },
+    "Timeout": 900,
+    "MemorySize": 128,
+    "Handler": "index.handler",
+    "Role": {
+     "Fn::GetAtt": [
+      "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs22.x",
+    "Description": {
+     "Fn::Join": [
+      "",
+      [
+       "Lambda function for auto-deleting objects in ",
+       {
+        "Ref": "DeviceDataBucket83CE3970"
+       },
+       " S3 bucket."
+      ]
+     ]
+    }
+   },
+   "DependsOn": [
+    "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "IotCdkStack/Custom::S3AutoDeleteObjectsCustomResourceProvider/Handler",
+    "aws:asset:path": "asset.faa95a81ae7d7373f3e1f242268f904eb748d8d0fdd306e8a6fe515a1905a7d6",
+    "aws:asset:property": "Code"
+   }
+  },
+  "LambdaExecutionRoleD5C26073": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "IotCdkStack/LambdaExecutionRole/Resource"
+   }
+  },
+  "LambdaExecutionRoleDefaultPolicy6D69732F": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "s3:DeleteObject*",
+        "s3:PutObject",
+        "s3:PutObjectLegalHold",
+        "s3:PutObjectRetention",
+        "s3:PutObjectTagging",
+        "s3:PutObjectVersionTagging",
+        "s3:Abort*"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "DeviceDataBucket83CE3970",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "DeviceDataBucket83CE3970",
+             "Arn"
+            ]
+           },
+           "/*"
+          ]
+         ]
+        }
+       ]
+      },
+      {
+       "Action": "iot:Publish",
+       "Effect": "Allow",
+       "Resource": "*"
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "LambdaExecutionRoleDefaultPolicy6D69732F",
+    "Roles": [
+     {
+      "Ref": "LambdaExecutionRoleD5C26073"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "IotCdkStack/LambdaExecutionRole/DefaultPolicy/Resource"
+   }
+  },
+  "DeviceHandler5D859E05": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-411310021228-ap-south-1",
+     "S3Key": "747acca4f19092aba1ac9cbc87bbae371d66058f0a121b39752c8c9239b3c65b.zip"
+    },
+    "Environment": {
+     "Variables": {
+      "BUCKET_NAME": {
+       "Ref": "DeviceDataBucket83CE3970"
+      },
+      "IOT_ENDPOINT": "YOUR_IOT_ENDPOINT"
+     }
+    },
+    "Handler": "index.handler",
+    "Role": {
+     "Fn::GetAtt": [
+      "LambdaExecutionRoleD5C26073",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs20.x"
+   },
+   "DependsOn": [
+    "LambdaExecutionRoleDefaultPolicy6D69732F",
+    "LambdaExecutionRoleD5C26073"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "IotCdkStack/DeviceHandler/Resource",
+    "aws:asset:path": "asset.747acca4f19092aba1ac9cbc87bbae371d66058f0a121b39752c8c9239b3c65b",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "DeviceApi9D675668": {
+   "Type": "AWS::ApiGateway::RestApi",
+   "Properties": {
+    "Name": "Device Data API"
+   },
+   "Metadata": {
+    "aws:cdk:path": "IotCdkStack/DeviceApi/Resource"
+   }
+  },
+  "DeviceApiCloudWatchRoleEE5F3E7B": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "apigateway.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
+       ]
+      ]
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "IotCdkStack/DeviceApi/CloudWatchRole/Resource"
+   }
+  },
+  "DeviceApiAccount8B289947": {
+   "Type": "AWS::ApiGateway::Account",
+   "Properties": {
+    "CloudWatchRoleArn": {
+     "Fn::GetAtt": [
+      "DeviceApiCloudWatchRoleEE5F3E7B",
+      "Arn"
+     ]
+    }
+   },
+   "DependsOn": [
+    "DeviceApi9D675668"
+   ],
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "IotCdkStack/DeviceApi/Account"
+   }
+  },
+  "DeviceApiDeploymentBDDC61EDb11c75db3af0661d187e11f75db1f97d": {
+   "Type": "AWS::ApiGateway::Deployment",
+   "Properties": {
+    "Description": "Automatically created by the RestApi construct",
+    "RestApiId": {
+     "Ref": "DeviceApi9D675668"
+    }
+   },
+   "DependsOn": [
+    "DeviceApidevicePOSTFDEE50D2",
+    "DeviceApidevice7DA7633D"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "IotCdkStack/DeviceApi/Deployment/Resource",
+    "aws:cdk:do-not-refactor": true
+   }
+  },
+  "DeviceApiDeploymentStageprod0ACE7F5F": {
+   "Type": "AWS::ApiGateway::Stage",
+   "Properties": {
+    "DeploymentId": {
+     "Ref": "DeviceApiDeploymentBDDC61EDb11c75db3af0661d187e11f75db1f97d"
+    },
+    "RestApiId": {
+     "Ref": "DeviceApi9D675668"
+    },
+    "StageName": "prod"
+   },
+   "DependsOn": [
+    "DeviceApiAccount8B289947"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "IotCdkStack/DeviceApi/DeploymentStage.prod/Resource"
+   }
+  },
+  "DeviceApidevice7DA7633D": {
+   "Type": "AWS::ApiGateway::Resource",
+   "Properties": {
+    "ParentId": {
+     "Fn::GetAtt": [
+      "DeviceApi9D675668",
+      "RootResourceId"
+     ]
+    },
+    "PathPart": "device",
+    "RestApiId": {
+     "Ref": "DeviceApi9D675668"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "IotCdkStack/DeviceApi/Default/device/Resource"
+   }
+  },
+  "DeviceApidevicePOSTApiPermissionIotCdkStackDeviceApi36252E9EPOSTdevice78471ADD": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "DeviceHandler5D859E05",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:ap-south-1:411310021228:",
+       {
+        "Ref": "DeviceApi9D675668"
+       },
+       "/",
+       {
+        "Ref": "DeviceApiDeploymentStageprod0ACE7F5F"
+       },
+       "/POST/device"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "IotCdkStack/DeviceApi/Default/device/POST/ApiPermission.IotCdkStackDeviceApi36252E9E.POST..device"
+   }
+  },
+  "DeviceApidevicePOSTApiPermissionTestIotCdkStackDeviceApi36252E9EPOSTdeviceDB89DAD0": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "DeviceHandler5D859E05",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:ap-south-1:411310021228:",
+       {
+        "Ref": "DeviceApi9D675668"
+       },
+       "/test-invoke-stage/POST/device"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "IotCdkStack/DeviceApi/Default/device/POST/ApiPermission.Test.IotCdkStackDeviceApi36252E9E.POST..device"
+   }
+  },
+  "DeviceApidevicePOSTFDEE50D2": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "POST",
+    "Integration": {
+     "IntegrationHttpMethod": "POST",
+     "Type": "AWS_PROXY",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":apigateway:ap-south-1:lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "DeviceHandler5D859E05",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "ResourceId": {
+     "Ref": "DeviceApidevice7DA7633D"
+    },
+    "RestApiId": {
+     "Ref": "DeviceApi9D675668"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "IotCdkStack/DeviceApi/Default/device/POST/Resource"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/22PTW6DMBCFz5K946YgtWuSqruqiBwgcsyUTgAbMeMghHz3yjYqqdTV+978Tyaz/EUedmqiva7bfYdXuZxZ6VaoiS4L5XI5Ot0Ci9OXWSlJaTvU8xZefTJHReAFql4ule0gVEXdmhJ50an+Wiu5vDujGa0JuUcuYeyRCK3xgvKLIgImWQQRasBGMUxqlksFxMWAcdOGhdbWGRZvMHR27sHEPx7cmVUTz0tQAVk3agj3/5p1ZuIP4G9bh1Ai78XJEdv+3+q/qXK0d6xhjNPjC2Ermib0fDoeHHthbA3yRk/3LJPPr/KwuxHifnSGsQdZJf0B7g3BmbgBAAA="
+   },
+   "Metadata": {
+    "aws:cdk:path": "IotCdkStack/CDKMetadata/Default"
+   }
+  }
+ },
+ "Outputs": {
+  "DeviceApiEndpoint6E8144A4": {
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "https://",
+      {
+       "Ref": "DeviceApi9D675668"
+      },
+      ".execute-api.ap-south-1.",
+      {
+       "Ref": "AWS::URLSuffix"
+      },
+      "/",
+      {
+       "Ref": "DeviceApiDeploymentStageprod0ACE7F5F"
+      },
+      "/"
+     ]
+    ]
+   }
+  },
+  "ApiUrl": {
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "https://",
+      {
+       "Ref": "DeviceApi9D675668"
+      },
+      ".execute-api.ap-south-1.",
+      {
+       "Ref": "AWS::URLSuffix"
+      },
+      "/",
+      {
+       "Ref": "DeviceApiDeploymentStageprod0ACE7F5F"
+      },
+      "/"
+     ]
+    ]
+   }
+  },
+  "BucketName": {
+   "Value": {
+    "Ref": "DeviceDataBucket83CE3970"
+   }
+  }
+ },
+ "Parameters": {
+  "BootstrapVersion": {
+   "Type": "AWS::SSM::Parameter::Value<String>",
+   "Default": "/cdk-bootstrap/hnb659fds/version",
+   "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+  }
+ },
+ "Rules": {
+  "CheckBootstrapVersion": {
+   "Assertions": [
+    {
+     "Assert": {
+      "Fn::Not": [
+       {
+        "Fn::Contains": [
+         [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+         ],
+         {
+          "Ref": "BootstrapVersion"
+         }
+        ]
+       }
+      ]
+     },
+     "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+    }
+   ]
+  }
+ }
+}

@@ -1,0 +1,21 @@
+                                                                                                                                   
+  {                                                                                                                                 
+    "name": "@iot-cdk/device-provisioning",                                                                                         
+    "version": "1.0.0",                                                                                                             
+    "main": "dist/index.js",                                                                                                        
+    "types": "dist/index.d.ts",                                                                                                     
+    "scripts": {                                                                                                                    
+      "build": "tsc",                                                                                                               
+      "watch": "tsc -w"                                                                                                             
+    },                                                                                                                              
+    "dependencies": {                                                                                                               
+      "@aws-sdk/client-s3": "^3.540.0",                                                                                             
+      "@aws-sdk/client-iot-data-plane": "^3.540.0"                                                                                           
+    },                                                                                                                              
+    "devDependencies": {                                                                                                            
+      "@types/aws-lambda": "^8.10.136",                                                                                             
+      "@types/node": "^20.11.0",                                                                                                    
+      "typescript": "^5.3.3"                                                                                                        
+    }                                                                                                                               
+  }                                                                                                                                 
+     
